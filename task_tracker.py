@@ -17,6 +17,8 @@ except ImportError:
     NEO4J_AVAILABLE = False
     print("Warning: neo4j driver not installed. Install with: pip install neo4j")
 
+VERSION = "0.1.0"
+
 
 class TaskTracker:
     """Task tracker with Neo4j storage."""
@@ -151,6 +153,7 @@ class TaskTracker:
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(description="Task Tracker CLI")
+    parser.add_argument("--version", action="version", version=f"task-tracker {VERSION}")
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Add command
