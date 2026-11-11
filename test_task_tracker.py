@@ -4,6 +4,8 @@
 import os
 import sys
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 from unittest.mock import Mock, patch, MagicMock
 
 # Mock neo4j before importing task_tracker
@@ -179,6 +181,20 @@ class TestTaskTracker(unittest.TestCase):
         call_args = mock_session.run.call_args
         self.assertIn("status: $status", call_args[0][0])
         self.assertEqual(call_args[1]["status"], "todo")
+
+
+    @patch("task_tracker.TaskTracker")
+    def test_version_flag(self, mock_tracker_class):
+        """Test that --version prints the version and exits without a DB connection."""
+        with patch.object(sys, "argv", ["task_tracker.py", "--version"]):
+            stdout = StringIO()
+            with redirect_stdout(stdout):
+                with self.assertRaises(SystemExit) as ctx:
+                    task_tracker.main()
+
+        self.assertEqual(ctx.exception.code, 0)
+        self.assertIn("task-tracker 0.1.0", stdout.getvalue())
+        mock_tracker_class.assert_not_called()
 
 
 if __name__ == "__main__":
